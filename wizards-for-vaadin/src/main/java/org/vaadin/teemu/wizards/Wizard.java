@@ -585,4 +585,28 @@ public class Wizard extends CustomComponent implements
         }
     }
 
+    /**
+     * Set the maximum number of step titles displayed at once in the progress
+     * bar. The caption window slides with the active step when the wizard has
+     * more steps than the maximum.
+     *
+     * @param displayedMaxTitles maximum titles displayed at once
+     */
+    public void setDisplayedMaxTitles(int displayedMaxTitles) {
+        if (getHeader() instanceof WizardProgressBar) {
+            ((WizardProgressBar) getHeader()).setMaxStepsDisplayed(
+                    displayedMaxTitles);
+        }
+    }
+
+    /**
+     * Update the displayed step. Re-activates the current step, e.g. after
+     * steps have been added or changed dynamically.
+     */
+    public void updateCurrentStep() {
+        if (currentStep != null) {
+            activateStep(currentStep);
+        }
+    }
+
 }

@@ -27,6 +27,7 @@ public class WizardProgressBar extends CustomComponent implements
     private final ProgressBar progressBar = new ProgressBar();
     private final HorizontalLayout stepCaptions = new HorizontalLayout();
     private int activeStepIndex;
+    private int maxStepsDisplayed = Integer.MAX_VALUE;
 
     public WizardProgressBar(Wizard wizard) {
         setStyleName("wizard-progress-bar");
@@ -54,11 +55,35 @@ public class WizardProgressBar extends CustomComponent implements
     private void updateStepCaptions() {
         stepCaptions.removeAllComponents();
         int index = 1;
+        int total = wizard.getSteps().size();
+        int windowStart = 0;
+        if (total > maxStepsDisplayed) {
+            // Keep the active step visible, sliding the caption window with it.
+            windowStart = Math.max(0,
+                    Math.min(activeStepIndex - maxStepsDisplayed / 2,
+                            total - maxStepsDisplayed));
+        }
+        int shown = 0;
         for (WizardStep step : wizard.getSteps()) {
-            Label label = createCaptionLabel(index, step);
-            stepCaptions.addComponent(label);
+            if (index - 1 >= windowStart && shown < maxStepsDisplayed) {
+                Label label = createCaptionLabel(index, step);
+                stepCaptions.addComponent(label);
+                shown++;
+            }
             index++;
         }
+    }
+
+    /**
+     * Set the maximum number of step captions displayed at once. When the
+     * wizard has more steps, the window slides to keep the active step
+     * visible. Defaults to showing all steps.
+     *
+     * @param max maximum captions displayed at once
+     */
+    public void setMaxStepsDisplayed(int max) {
+        this.maxStepsDisplayed = Math.max(1, max);
+        updateProgressAndCaptions();
     }
 
     private Label createCaptionLabel(int index, WizardStep step) {
